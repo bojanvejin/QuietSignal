@@ -1,0 +1,23 @@
+{
+  "hosting": {
+    "public": ".next/static",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [
+      { "source": "/api/signal", "function": "signal" },
+      { "source": "/api/ingest", "function": "ingest" },
+      { "source": "/api/review", "function": "review" },
+      { "source": "**", "destination": "/index.html" }
+    ],
+    "headers": [
+      {
+        "source": "**/*.@(js|css|html|png|jpg|jpeg|gif|svg|ico)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=31536000, immutable"
+          }
+        ]
+      }
+    ]
+  }
+}

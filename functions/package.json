@@ -1,0 +1,26 @@
+{
+  "name": "quiet-signal-functions",
+  "private": true,
+  "type": "module",
+  "engines": { "node": "18" },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "serve": "firebase emulators:start --only functions,firestore,hosting",
+    "start": "npm run build && firebase emulators:start --only functions",
+    "lint": "eslint .",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "axios": "^1.7.2",
+    "firebase-admin": "^12.5.0",
+    "firebase-functions": "^5.0.1",
+    "linkedom": "^0.18.5",
+    "node-cache": "^5.1.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.30",
+    "eslint": "^9.8.0",
+    "typescript": "^5.4.5",
+    "vitest": "^2.0.5"
+  }
+}

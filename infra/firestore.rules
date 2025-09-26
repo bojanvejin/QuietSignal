@@ -1,0 +1,47 @@
+// Firestore security rules — tighten as needed
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() { return request.auth != null; }
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.role == 'admin';
+    }
+    function isReviewer() {
+      return isSignedIn() && (request.auth.token.role in ['admin','reviewer']);
+    }
+
+    // Publicly readable, write-restricted content
+    match /items/{itemId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /claims/{claimId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /scores/{scoreId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if isReviewer();
+      allow update, delete: if isAdmin() || (isReviewer() && request.resource.data.reviewerUid == request.auth.uid);
+    }
+
+    match /users/{uid} {
+      allow read: if isAdmin() || (isSignedIn() && uid == request.auth.uid);
+      allow write: if isAdmin() || (isSignedIn() && uid == request.auth.uid);
+    }
+
+    // cache/docs buckets (optional)
+    match /caches/{doc} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}

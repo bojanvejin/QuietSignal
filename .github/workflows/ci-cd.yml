@@ -1,0 +1,44 @@
+name: CI & Deploy
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  PROJECT_ID: ${{ secrets.PROJECT_ID }}
+  FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install Frontend (Next.js)
+        working-directory: ./
+        run: npm ci
+
+      - name: Build Frontend (Next.js)
+        working-directory: ./
+        run: npm run build
+
+      - name: Install Functions
+        working-directory: ./functions
+        run: npm ci
+
+      - name: Test Functions
+        working-directory: ./functions
+        run: npm test --if-present
+
+      - name: Deploy to Firebase
+        run: |
+          npm i -g firebase-tools
+          firebase use $PROJECT_ID
+          firebase deploy --only hosting,functions,firestore --token "$FIREBASE_TOKEN"
